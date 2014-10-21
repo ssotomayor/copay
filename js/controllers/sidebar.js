@@ -36,6 +36,8 @@ angular.module('copayApp.controllers').controller('SidebarController', function(
 
   $scope.refresh = function() {
     var w = $rootScope.wallet;
+    if (!w) return;
+
     if (w.isReady()) {
       w.sendWalletReady();
       if ($rootScope.addrInfos.length > 0) {
@@ -84,6 +86,8 @@ angular.module('copayApp.controllers').controller('SidebarController', function(
 
   $scope.toggleWalletSelection = function() {
     $scope.walletSelection = !$scope.walletSelection;
+    if (!$scope.walletSelection) return;
+
     $scope.wallets = [];
     var wids = _.pluck($rootScope.iden.listWallets(), 'id');
     _.each(wids, function(wid) {
