@@ -21,11 +21,11 @@ angular.module('copayApp.controllers').controller('CopayersController',
     };
 
     $scope.downloadBackup = function(w) {
-      backupService.download(w);
+      backupService.walletDownload(w);
     };
     
     $scope.viewBackup = function(w) {
-      $scope.backupPlainText = backupService.getBackup(w);
+      $scope.backupPlainText = backupService.walletEncrypted(w);
       $scope.hideViewBackup = true;
     };
 
@@ -34,20 +34,21 @@ angular.module('copayApp.controllers').controller('CopayersController',
       $location.path('/receive');
     };
 
-    $scope.deleteWallet = function() {
-      var w = $rootScope.iden;
-      iden.deleteWallet(w.id, function() {
-        controllerUtils.logout();
-      });
-    };
-
     $scope.copayersList = function() {
-      $scope.copayers = $rootScope.wallet.getRegisteredPeerIds();
+      if ($rootScope.wallet) {
+        $scope.copayers = $rootScope.wallet.getRegisteredPeerIds();
+      }
       return $scope.copayers;
     }
 
     $scope.isBackupReady = function(copayer) {
-      return $rootScope.wallet.publicKeyRing.isBackupReady(copayer.copayerId);
+      if ($rootScope.wallet) {
+        return $rootScope.wallet.publicKeyRing.isBackupReady(copayer.copayerId);
+      }
+    }
+
+    $scope.deleteWallet = function() {
+      controllerUtils.deleteWallet($scope);
     }
 
   });

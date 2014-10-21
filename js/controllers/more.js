@@ -52,6 +52,7 @@ angular.module('copayApp.controllers').controller('MoreController',
         break;
       }
     }
+
     $scope.save = function() {
       w.changeSettings({
         unitName: $scope.selectedUnit.shortName,
@@ -78,15 +79,12 @@ angular.module('copayApp.controllers').controller('MoreController',
     }
 
     $scope.viewBackup = function() {
-      $scope.backupPlainText = backupService.getBackup(w);
+      $scope.backupPlainText = backupService.walletEncrypted(w);
       $scope.hideViewBackup = true;
     };
 
     $scope.deleteWallet = function() {
-      $rootScope.iden.deleteWallet(w.id, function() {
-        notification.info('Wallet deleted', $filter('translate')('wallet deleted'));
-        $location.path('/manage');
-      });
+      controllerUtils.deleteWallet($scope);
     };
 
     $scope.purge = function(deleteAll) {
