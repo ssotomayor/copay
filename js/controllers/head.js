@@ -1,8 +1,8 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('HeadController', function($scope, $rootScope, notification, controllerUtils) {
+angular.module('copayApp.controllers').controller('HeadController', function($scope, $rootScope, $filter, notification, controllerUtils) {
 
-  $scope.username = $rootScope.iden.profile.email;
+  $scope.username = $rootScope.iden.email;
   $scope.hoverMenu = false;
 
   $scope.hoverIn = function(){

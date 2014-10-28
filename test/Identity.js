@@ -255,7 +255,7 @@ describe('Identity model', function() {
 
       var fakeCrypto = {
         kdf: sinon.stub().returns('passphrase'),
-        decrypt: sinon.stub().returns({walletId:123}),
+        decrypt: sinon.stub().returns('{"walletId":123}'),
       };
 
       var opts = {
@@ -264,7 +264,7 @@ describe('Identity model', function() {
       };
 
       Identity.create(args.params, function(err, iden) {
-        iden.importWallet(123,'password', opts, function(err){
+        iden.importEncryptedWallet(123,'password', opts, function(err){
           should.not.exist(err);
           fakeCrypto.kdf.getCall(0).args[0].should.equal('password');
           fakeCrypto.decrypt.getCall(0).args[0].should.equal('passphrase');
