@@ -183,4 +183,25 @@ Compatibility.readWalletPre8 = function(walletId, password, cb) {
   }
 };
 
+Compatibility.importEncryptedWallet = function(cypherText, password, opts, cb) {
+
+  var crypto = opts.cryptoUtil || cryptoUtils;
+  // TODO set iter and salt using config.js
+  var key = crypto.kdf(password);
+  var obj = crypto.decrypt(key, cypherText);
+  if (!obj) {
+    console.warn("Could not decrypt, trying legacy..");
+    obj = this._decrypt(key, cypherText);
+    if(!obj)
+      return cb(new Error('Could not decrypt legacy'))
+  };
+  try {
+    obj = JSON.parse(obj);
+  } catch (e) {
+    return cb(new Error('Could not decrypt'));
+  }
+  return this.importWalletFromObj(obj, opts, cb)
+};
+
+
 module.exports = Compatibility;

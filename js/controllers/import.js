@@ -65,7 +65,15 @@ angular.module('copayApp.controllers').controller('ImportController',
       reader.onloadend = function(evt) {
         if (evt.target.readyState == FileReader.DONE) { // DONE == 2
           var encryptedObj = evt.target.result;
-          _importBackup(encryptedObj);
+          try {
+//          _importBackup(encryptedObj);
+            Compatibility.importEncryptedWallet(encryptedObj, $scope.password, {}, function(err){console.log(err)});
+          }
+          catch(e){
+            console.log("Compatibility");
+            console.log(Compatibility);
+            Compatibility.importEncryptedWallet(encryptedObj, $scope.password, {}, function(err){console.log(err)});
+          }
         }
       };
     };
@@ -97,7 +105,7 @@ angular.module('copayApp.controllers').controller('ImportController',
         try {
           _importBackup(backupText);
         } catch(e) {
-          Compatibility.preDotEightImportWalletToStorage(backupText, $scope.password, $scope.skipPublicKeyRing, $scope.skipTxProposals);
+          Compatibility.importEncryptedWallet(backupText, $scope.password, $scope.skipPublicKeyRing, $scope.skipTxProposals);
         }
       }
     };
