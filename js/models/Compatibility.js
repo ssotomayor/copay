@@ -4,9 +4,13 @@ var Identity = require('./Identity');
 var Wallet = require('./Wallet');
 var cryptoUtils = require('../util/crypto');
 var CryptoJS = require('node-cryptojs-aes').CryptoJS;
+var sjcl = require('../../lib/sjcl');
+var preconditions = require('preconditions').instance();
+var _ = require('underscore');
 
 var Compatibility = {};
-
+Compatibility.iterations = 100;
+Compatibility.salt = 'mjuBtGybi/4=';
 /**
  * Reads from localstorage wallets saved previously to 0.8
  */
@@ -184,14 +188,15 @@ Compatibility.readWalletPre8 = function(walletId, password, cb) {
 };
 
 Compatibility.importEncryptedWallet = function(cypherText, password, opts, cb) {
-
   var crypto = opts.cryptoUtil || cryptoUtils;
   // TODO set iter and salt using config.js
   var key = crypto.kdf(password);
   var obj = crypto.decrypt(key, cypherText);
   if (!obj) {
     console.warn("Could not decrypt, trying legacy..");
-    obj = Compatibility._decrypt(key, cypherText);
+    password = this.kdf(key);
+    debugger;
+    obj = Compatibility._decrypt(cypherText, key);
     if(!obj)
       return cb(new Error('Could not decrypt legacy'))
   };
@@ -201,6 +206,29 @@ Compatibility.importEncryptedWallet = function(cypherText, password, opts, cb) {
     return cb(new Error('Could not decrypt'));
   }
   return this.importWalletFromObj(obj, opts, cb);
+};
+
+/**
+ * @desc Generate a WordArray expanding a password
+ *
+ * @param {string} password - the password to expand
+ * @returns WordArray 512 bits with the expanded key generated from password
+ */
+Compatibility.kdf = function(password) {
+  var hash = sjcl.hash.sha256.hash(sjcl.hash.sha256.hash(password));
+  var salt = sjcl.codec.base64.toBits(this.salt);
+
+  var crypto2 = function(key, salt, iterations, length, alg) {
+    return sjcl.codec.hex.fromBits(sjcl.misc.pbkdf2(key, salt, iterations, length * 8,
+        alg == 'sha1' ? function(key) {
+        return new sjcl.misc.hmac(key, sjcl.hash.sha1)
+      } : null
+    ))
+  };
+
+  var key512 = crypto2(hash, salt, this.iterations, 64, 'sha1');
+  var sbase64 = sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(key512));
+  return sbase64;
 };
 
 
