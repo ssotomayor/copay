@@ -65,15 +65,8 @@ angular.module('copayApp.controllers').controller('ImportController',
       reader.onloadend = function(evt) {
         if (evt.target.readyState == FileReader.DONE) { // DONE == 2
           var encryptedObj = evt.target.result;
-          try {
 //          _importBackup(encryptedObj);
             Compatibility.importEncryptedWallet(encryptedObj, $scope.password, {}, function(err){console.log(err)});
-          }
-          catch(e){
-            console.log("Compatibility");
-            console.log(Compatibility);
-            Compatibility.importEncryptedWallet(encryptedObj, $scope.password, {}, function(err){console.log(err)});
-          }
         }
       };
     };
