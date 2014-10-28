@@ -191,7 +191,7 @@ Compatibility.importEncryptedWallet = function(cypherText, password, opts, cb) {
   var obj = crypto.decrypt(key, cypherText);
   if (!obj) {
     console.warn("Could not decrypt, trying legacy..");
-    obj = this._decrypt(key, cypherText);
+    obj = Compatibility._decrypt(key, cypherText);
     if(!obj)
       return cb(new Error('Could not decrypt legacy'))
   };
@@ -200,7 +200,7 @@ Compatibility.importEncryptedWallet = function(cypherText, password, opts, cb) {
   } catch (e) {
     return cb(new Error('Could not decrypt'));
   }
-  return this.importWalletFromObj(obj, opts, cb)
+  return this.importWalletFromObj(obj, opts, cb);
 };
 
 
